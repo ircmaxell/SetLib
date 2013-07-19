@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "files": [
+            "lib/SetLib/functions.php"
+        ],
+        "psr-0": {
+            "SetLib": "lib"
+        }
+    }
+}
