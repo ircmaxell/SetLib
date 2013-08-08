@@ -97,6 +97,28 @@ class Set implements \IteratorAggregate {
         }));
     }
 
+    public function sort($cmp = null) {
+        if (!$cmp) {
+            $cmp = function($a, $b) { return $a < $b ? -1 : 1; };
+        }
+        $last = null;
+        $tmp = Set($this->map(function($element) {
+            return new \ArrayIterator(array($element));
+        })->reduce(function($result, $value) use ($cmp, &$last) {
+            if ($last) {
+                $result = new MergeIterator($result, new MergeIterator($last, $value, $cmp), $cmp);
+                $last = null;
+            } else {
+                $last = $value;
+            }
+            return $result;
+        }));
+        if ($last) {
+            $tmp = new MergeIterator($tmp, $last, $cmp);
+        }
+        return Set($tmp);
+    }
+
     public function zip() {
         $set = $this->map('SetLib\Set')->map(function($subset) { return $subset->getIterator(); })->toArray();
         return Set(new RewindableGenerator(function() use ($set) {
